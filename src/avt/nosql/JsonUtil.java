@@ -199,21 +199,29 @@ public class JsonUtil {
       int counter = 1;
       for (Map.Entry<String, Field> r : fields.entrySet()) {
         Field f = r.getValue();
-        content.append(r.getKey()).append(" ").append(f.getType());
-        if (f.isComplexField()) {
-          content.append(" (").append(f.getContent()).append(")");
+        if (f != null){
+          content.append(r.getKey());
+          content.append(" ");
+          content.append(f.getType());
+          if (f.isComplexField()) {
+            content.append(" (");
+            content.append(f.getContent());
+            content.append(")");
+          }
+          if (counter < fields.size()) content.append(",\n");
+        }else {
+          // TODO:
         }
-        if (counter < fields.size()) content.append(", ");
         counter ++;
       }
-
       return new Field("RECORD", content.toString());
     }
 
     @Override
     public Field array(ArrayNode array, List<Field> elements) {
       // TODO: Distinguir entre array y map según el tipo de los elementos
-      return new Field("ARRAY", elements.get(0).getType());
+      String components = (elements.size() > 0) ? elements.get(0).getType() : "NULL";
+      return new Field("ARRAY", components);
     }
 
     @Override
@@ -236,10 +244,10 @@ public class JsonUtil {
       return new Field("BOOLEAN", ignored.toString());
     }
 
-    @Override
+/*    @Override
     public Field nullNode(NullNode ignored) {
       throw new UnsupportedOperationException("NullNode is not supported.");
-    }
+    }*/
 
     @Override
     public Field missing(MissingNode ignored) {
@@ -248,9 +256,9 @@ public class JsonUtil {
   }
 
   private static String inferSchema(JsonNode node, String tableName, String pk) {
-    Field tableSchema = visit(node, new JsonSchemaVisitor().useMaps());
+    Field tableSchema = visit(node, new JsonSchemaVisitor());
     String statement = "CREATE TABLE " + tableName + " (" + tableSchema.getContent();
-    statement += (pk == null) ? ");" : ", PRIMARY KEY (" + pk + "));";
+    statement += (pk == null) ? ");" : "PRIMARY KEY (" + pk + "));";
     return statement;
   }
 
