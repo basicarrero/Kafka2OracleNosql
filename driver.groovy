@@ -1,4 +1,6 @@
-final String tableName = "coches"
-final String myJson = "{\"matricula\":1234, \"partes\":{\"num_ruedas\":[8,8,5,4], \"motor\":\"V8\"}}"
+import java.nio.file.Paths
 
-println(JsonUtil.inferSchema(myJson, tableName))
+if (args.size() == 2 || args.size() == 3)
+    println(JsonUtil.inferSchema(Paths.get(args[1]), args[0], (args.size() == 3) ? args[2] : null))
+else
+    println(JsonUtil.inferSchema(Paths.get("./sample.json"), "coches", "matricula"))
