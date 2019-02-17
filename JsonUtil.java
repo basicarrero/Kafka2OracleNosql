@@ -1,25 +1,5 @@
-/*
- * Copyright 2013 Cloudera Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package org.kitesdk.data.spi;
-
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -30,99 +10,65 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.Collection;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import org.apache.avro.AvroRuntimeException;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
-import org.kitesdk.data.DatasetIOException;
-import org.kitesdk.data.DatasetRecordException;
-import org.kitesdk.data.ValidationException;
 
 public class JsonUtil {
 
+  public static class Field {
+    private String type;
+    Object content;
+    Field(String type, Object content){
+      this.type = type;
+      this.content = content;
+    }
+
+    String getType() {
+      return type;
+    }
+
+    String getContent() {
+      return toString();
+    }
+
+    boolean isComplexField() {
+      return "ARRAY".equals(type) || "RECORD".equals(type);
+    }
+    @Override
+    public String toString() {
+      return content.toString();
+    }
+  }
+
   private static final JsonFactory FACTORY = new JsonFactory();
 
-  public static Iterator<JsonNode> parser(final InputStream stream) {
-    try {
-      JsonParser parser = FACTORY.createParser(stream);
-      parser.setCodec(new ObjectMapper());
-      return parser.readValuesAs(JsonNode.class);
-    } catch (IOException e) {
-      throw new DatasetIOException("Cannot read from stream", e);
-    }
+  private static Iterator<JsonNode> parser(final InputStream stream) throws IOException {
+    JsonParser parser = FACTORY.createParser(stream);
+    parser.setCodec(new ObjectMapper());
+    return parser.readValuesAs(JsonNode.class);
   }
 
-  public static JsonNode parse(String json) {
-    return parse(json, JsonNode.class);
+  private static JsonNode parse(String json) throws IOException {
+    return new ObjectMapper().readValue(json, JsonNode.class);
   }
 
-  public static <T> T parse(String json, Class<T> returnType) {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      return mapper.readValue(json, returnType);
-    } catch (JsonParseException e) {
-      throw new ValidationException("Invalid JSON", e);
-    } catch (JsonMappingException e) {
-      throw new ValidationException("Invalid JSON", e);
-    } catch (IOException e) {
-      throw new DatasetIOException("Cannot initialize JSON parser", e);
-    }
-  }
-
-  public static JsonNode parse(File file) {
-    return parse(file, JsonNode.class);
-  }
-
-  public static <T> T parse(File file, Class<T> returnType) {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      return mapper.readValue(file, returnType);
-    } catch (JsonParseException e) {
-      throw new ValidationException("Invalid JSON", e);
-    } catch (JsonMappingException e) {
-      throw new ValidationException("Invalid JSON", e);
-    } catch (IOException e) {
-      throw new DatasetIOException("Cannot initialize JSON parser", e);
-    }
-  }
-
-  public static JsonNode parse(InputStream in) {
-    return parse(in, JsonNode.class);
-  }
-
-  public static <T> T parse(InputStream in, Class<T> returnType) {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      return mapper.readValue(in, returnType);
-    } catch (JsonParseException e) {
-      throw new ValidationException("Invalid JSON", e);
-    } catch (JsonMappingException e) {
-      throw new ValidationException("Invalid JSON", e);
-    } catch (IOException e) {
-      throw new DatasetIOException("Cannot initialize JSON parser", e);
-    }
+  private static JsonNode parse(Path filePath) throws IOException {
+    String fileContent = String.join(" ", Files.readAllLines(filePath, StandardCharsets.UTF_8));
+    return new ObjectMapper().readValue(fileContent, JsonNode.class);
   }
 
   public abstract static class JsonTreeVisitor<T> {
-    protected LinkedList<String> recordLevels = Lists.newLinkedList();
+    LinkedList<String> recordLevels = Lists.newLinkedList();
 
     public T object(ObjectNode object, Map<String, T> fields) {
       return null;
@@ -157,10 +103,7 @@ public class JsonUtil {
     }
   }
 
-  @edu.umd.cs.findbugs.annotations.SuppressWarnings(
-      value="BC_UNCONFIRMED_CAST",
-      justification="Uses precondition to validate casts")
-  public static <T> T visit(JsonNode node, JsonTreeVisitor<T> visitor) {
+  private static <T> T visit(JsonNode node, JsonTreeVisitor<T> visitor) {
     switch (node.getNodeType()) {
       case OBJECT:
         Preconditions.checkArgument(node instanceof ObjectNode,
@@ -233,422 +176,85 @@ public class JsonUtil {
     }
   }
 
-  public static Object convertToAvro(GenericData model, JsonNode datum,
-                                     Schema schema) {
-    if (datum == null) {
-      return null;
-    }
-    switch (schema.getType()) {
-      case RECORD:
-        DatasetRecordException.check(datum.isObject(),
-            "Cannot convert non-object to record: %s", datum);
-        Object record = model.newRecord(null, schema);
-        for (Schema.Field field : schema.getFields()) {
-          model.setField(record, field.name(), field.pos(),
-              convertField(model, datum.get(field.name()), field));
-        }
-        return record;
+  public static class JsonSchemaVisitor extends JsonTreeVisitor<Field> {
 
-      case MAP:
-        DatasetRecordException.check(datum.isObject(),
-            "Cannot convert non-object to map: %s", datum);
-        Map<String, Object> map = Maps.newLinkedHashMap();
-        Iterator<Map.Entry<String, JsonNode>> iter = datum.fields();
-        while (iter.hasNext()) {
-          Map.Entry<String, JsonNode> entry = iter.next();
-          map.put(entry.getKey(), convertToAvro(
-              model, entry.getValue(), schema.getValueType()));
-        }
-        return map;
+    private boolean objectsToRecords;
 
-      case ARRAY:
-        DatasetRecordException.check(datum.isArray(),
-            "Cannot convert to array: %s", datum);
-        List<Object> list = Lists.newArrayListWithExpectedSize(datum.size());
-        for (JsonNode element : datum) {
-          list.add(convertToAvro(model, element, schema.getElementType()));
-        }
-        return list;
-
-      case UNION:
-        return convertToAvro(model, datum,
-            resolveUnion(datum, schema.getTypes()));
-
-      case BOOLEAN:
-        DatasetRecordException.check(datum.isBoolean(),
-            "Cannot convert to boolean: %s", datum);
-        return datum.booleanValue();
-
-      case FLOAT:
-        DatasetRecordException.check(datum.isFloat() || datum.isInt(),
-            "Cannot convert to float: %s", datum);
-        return datum.floatValue();
-
-      case DOUBLE:
-        DatasetRecordException.check(
-            datum.isDouble() || datum.isFloat() ||
-            datum.isLong() || datum.isInt(),
-            "Cannot convert to double: %s", datum);
-        return datum.doubleValue();
-
-      case INT:
-        DatasetRecordException.check(datum.isInt(),
-            "Cannot convert to int: %s", datum);
-        return datum.intValue();
-
-      case LONG:
-        DatasetRecordException.check(datum.isLong() || datum.isInt(),
-            "Cannot convert to long: %s", datum);
-        return datum.longValue();
-
-      case STRING:
-        DatasetRecordException.check(datum.isTextual(),
-            "Cannot convert to string: %s", datum);
-        return datum.textValue();
-
-      case ENUM:
-        DatasetRecordException.check(datum.isTextual(),
-            "Cannot convert to string: %s", datum);
-        return model.createEnum(datum.textValue(), schema);
-
-      case BYTES:
-        DatasetRecordException.check(datum.isBinary(),
-            "Cannot convert to binary: %s", datum);
-        try {
-          return ByteBuffer.wrap(datum.binaryValue());
-        } catch (IOException e) {
-          throw new DatasetRecordException("Failed to read JSON binary", e);
-        }
-
-      case FIXED:
-        DatasetRecordException.check(datum.isBinary(),
-            "Cannot convert to fixed: %s", datum);
-        byte[] bytes;
-        try {
-          bytes = datum.binaryValue();
-        } catch (IOException e) {
-          throw new DatasetRecordException("Failed to read JSON binary", e);
-        }
-        DatasetRecordException.check(bytes.length < schema.getFixedSize(),
-            "Binary data is too short: %s bytes for %s", bytes.length, schema);
-        return model.createFixed(null, bytes, schema);
-
-      case NULL:
-        return null;
-
-      default:
-        // don't use DatasetRecordException because this is a Schema problem
-        throw new IllegalArgumentException("Unknown schema type: " + schema);
-    }
+    JsonSchemaVisitor() {
+      this.objectsToRecords  = true;
   }
 
-  private static Object convertField(GenericData model, JsonNode datum,
-                                     Schema.Field field) {
-    try {
-      Object value = convertToAvro(model, datum, field.schema());
-      if (value != null || SchemaUtil.nullOk(field.schema())) {
-        return value;
-      } else {
-        return model.getDefaultValue(field);
-      }
-    } catch (DatasetRecordException e) {
-      // add the field name to the error message
-      throw new DatasetRecordException(String.format(
-          "Cannot convert field %s", field.name()), e);
-    } catch (AvroRuntimeException e) {
-      throw new DatasetRecordException(String.format(
-          "Field %s: cannot make %s value: '%s'",
-          field.name(), field.schema(), String.valueOf(datum)), e);
-    }
-  }
-
-  private static Schema resolveUnion(JsonNode datum, Collection<Schema> schemas) {
-    Set<Schema.Type> primitives = Sets.newHashSet();
-    List<Schema> others = Lists.newArrayList();
-    for (Schema schema : schemas) {
-      if (PRIMITIVES.containsKey(schema.getType())) {
-        primitives.add(schema.getType());
-      } else {
-        others.add(schema);
-      }
+    boolean isObjectsToRecords() {
+      return objectsToRecords;
     }
 
-    // Try to identify specific primitive types
-    Schema primitiveSchema = null;
-    if (datum == null || datum.isNull()) {
-      primitiveSchema = closestPrimitive(primitives, Schema.Type.NULL);
-    } else if (datum.isShort() || datum.isInt()) {
-      primitiveSchema = closestPrimitive(primitives,
-          Schema.Type.INT, Schema.Type.LONG,
-          Schema.Type.FLOAT, Schema.Type.DOUBLE);
-    } else if (datum.isLong()) {
-      primitiveSchema = closestPrimitive(primitives,
-          Schema.Type.LONG, Schema.Type.DOUBLE);
-    } else if (datum.isFloat()) {
-      primitiveSchema = closestPrimitive(primitives,
-          Schema.Type.FLOAT, Schema.Type.DOUBLE);
-    } else if (datum.isDouble()) {
-      primitiveSchema = closestPrimitive(primitives, Schema.Type.DOUBLE);
-    } else if (datum.isBoolean()) {
-      primitiveSchema = closestPrimitive(primitives, Schema.Type.BOOLEAN);
-    }
-
-    if (primitiveSchema != null) {
-      return primitiveSchema;
-    }
-
-    // otherwise, select the first schema that matches the datum
-    for (Schema schema : others) {
-      if (matches(datum, schema)) {
-        return schema;
-      }
-    }
-
-    throw new DatasetRecordException(String.format(
-        "Cannot resolve union: %s not in %s", datum, schemas));
-  }
-
-  // this does not contain string, bytes, or fixed because the datum type
-  // doesn't necessarily determine the schema.
-  private static ImmutableMap<Schema.Type, Schema> PRIMITIVES = ImmutableMap
-      .<Schema.Type, Schema>builder()
-      .put(Schema.Type.NULL, Schema.create(Schema.Type.NULL))
-      .put(Schema.Type.BOOLEAN, Schema.create(Schema.Type.BOOLEAN))
-      .put(Schema.Type.INT, Schema.create(Schema.Type.INT))
-      .put(Schema.Type.LONG, Schema.create(Schema.Type.LONG))
-      .put(Schema.Type.FLOAT, Schema.create(Schema.Type.FLOAT))
-      .put(Schema.Type.DOUBLE, Schema.create(Schema.Type.DOUBLE))
-      .build();
-
-  private static Schema closestPrimitive(Set<Schema.Type> possible, Schema.Type... types) {
-    for (Schema.Type type : types) {
-      if (possible.contains(type) && PRIMITIVES.containsKey(type)) {
-        return PRIMITIVES.get(type);
-      }
-    }
-    return null;
-  }
-
-  private static boolean matches(JsonNode datum, Schema schema) {
-    switch (schema.getType()) {
-      case RECORD:
-        if (datum.isObject()) {
-          // check that each field is present or has a default
-          boolean missingField = false;
-          for (Schema.Field field : schema.getFields()) {
-            if (!datum.has(field.name()) && field.defaultValue() == null) {
-              missingField = true;
-              break;
-            }
-          }
-          if (!missingField) {
-            return true;
-          }
-        }
-        break;
-      case UNION:
-        if (resolveUnion(datum, schema.getTypes()) != null) {
-          return true;
-        }
-        break;
-      case MAP:
-        if (datum.isObject()) {
-          return true;
-        }
-        break;
-      case ARRAY:
-        if (datum.isArray()) {
-          return true;
-        }
-        break;
-      case BOOLEAN:
-        if (datum.isBoolean()) {
-          return true;
-        }
-        break;
-      case FLOAT:
-        if (datum.isFloat() || datum.isInt()) {
-          return true;
-        }
-        break;
-      case DOUBLE:
-        if (datum.isDouble() || datum.isFloat() ||
-            datum.isLong() || datum.isInt()) {
-          return true;
-        }
-        break;
-      case INT:
-        if (datum.isInt()) {
-          return true;
-        }
-        break;
-      case LONG:
-        if (datum.isLong() || datum.isInt()) {
-          return true;
-        }
-        break;
-      case STRING:
-        if (datum.isTextual()) {
-          return true;
-        }
-        break;
-      case ENUM:
-        if (datum.isTextual() && schema.hasEnumSymbol(datum.textValue())) {
-          return true;
-        }
-        break;
-      case BYTES:
-      case FIXED:
-        if (datum.isBinary()) {
-          return true;
-        }
-        break;
-      case NULL:
-        if (datum == null || datum.isNull()) {
-          return true;
-        }
-        break;
-      default: // UNION or unknown
-        throw new IllegalArgumentException("Unsupported schema: " + schema);
-    }
-    return false;
-  }
-
-  public static Schema inferSchema(InputStream incoming, final String name,
-                                   int numRecords) {
-    Iterator<Schema> schemas = Iterators.transform(parser(incoming),
-        new Function<JsonNode, Schema>() {
-          @Override
-          public Schema apply(JsonNode node) {
-            return inferSchema(node, name);
-          }
-        });
-
-    if (!schemas.hasNext()) {
-      return null;
-    }
-
-    Schema result = schemas.next();
-    for (int i = 1; schemas.hasNext() && i < numRecords; i += 1) {
-      result = SchemaUtil.merge(result, schemas.next());
-    }
-
-    return result;
-  }
-
-  public static Schema inferSchema(JsonNode node, String name) {
-    return visit(node, new JsonSchemaVisitor(name));
-  }
-
-  public static Schema inferSchemaWithMaps(JsonNode node, String name) {
-    return visit(node, new JsonSchemaVisitor(name).useMaps());
-  }
-
-  private static class JsonSchemaVisitor extends JsonTreeVisitor<Schema> {
-
-    private static final Joiner DOT = Joiner.on('.');
-    private final String name;
-    private boolean objectsToRecords = true;
-
-    public JsonSchemaVisitor(String name) {
-      this.name = name;
-    }
-
-    public JsonSchemaVisitor useMaps() {
+    private JsonSchemaVisitor useMaps() {
       this.objectsToRecords = false;
       return this;
     }
 
     @Override
-    public Schema object(ObjectNode object, Map<String, Schema> fields) {
-      if (objectsToRecords || recordLevels.size() < 1) {
-        List<Schema.Field> recordFields = Lists.newArrayListWithExpectedSize(
-            fields.size());
-
-        for (Map.Entry<String, Schema> entry : fields.entrySet()) {
-          recordFields.add(new Schema.Field(
-              entry.getKey(), entry.getValue(),
-              "Type inferred from '" + object.get(entry.getKey()) + "'",
-              null));
+    public Field object(ObjectNode object, Map<String, Field> fields) {
+      // TODO: Implementar seleccíon de tablas hijas o registros
+      if ( !isObjectsToRecords() && recordLevels.size() < 1) { /* TODO */ }
+      StringBuilder content = new StringBuilder();
+      int counter = 1;
+      for (Map.Entry<String, Field> r : fields.entrySet()) {
+        Field f = r.getValue();
+        content.append(r.getKey()).append(" ").append(f.getType());
+        if (f.isComplexField()) {
+          content.append(" (").append(f.getContent()).append(")");
         }
-
-        Schema recordSchema;
-        if (recordLevels.size() < 1) {
-          recordSchema = Schema.createRecord(name, null, null, false);
-        } else {
-          recordSchema = Schema.createRecord(
-              DOT.join(recordLevels), null, null, false);
-        }
-
-        recordSchema.setFields(recordFields);
-
-        return recordSchema;
-
-      } else {
-        // translate to a map; use LinkedHashSet to preserve schema order
-        switch (fields.size()) {
-          case 0:
-            return Schema.createMap(Schema.create(Schema.Type.NULL));
-          case 1:
-            return Schema.createMap(Iterables.getOnlyElement(fields.values()));
-          default:
-            return Schema.createMap(SchemaUtil.mergeOrUnion(fields.values()));
-        }
+        if (counter < fields.size()) content.append(", ");
+        counter ++;
       }
+
+      return new Field("RECORD", content.toString());
     }
 
     @Override
-    public Schema array(ArrayNode ignored, List<Schema> elementSchemas) {
-      // use LinkedHashSet to preserve schema order
-      switch (elementSchemas.size()) {
-        case 0:
-          return Schema.createArray(Schema.create(Schema.Type.NULL));
-        case 1:
-          return Schema.createArray(Iterables.getOnlyElement(elementSchemas));
-        default:
-          return Schema.createArray(SchemaUtil.mergeOrUnion(elementSchemas));
-      }
+    public Field array(ArrayNode array, List<Field> elements) {
+      // TODO: Distinguir entre array y map según el tipo de los elementos
+      return new Field("ARRAY", elements.get(0).getType());
     }
 
     @Override
-    public Schema binary(BinaryNode ignored) {
-      return Schema.create(Schema.Type.BYTES);
+    public Field binary(BinaryNode ignored) {
+      return new Field("BINARY", ignored.toString());
     }
 
     @Override
-    public Schema text(TextNode ignored) {
-      return Schema.create(Schema.Type.STRING);
+    public Field text(TextNode ignored) {
+      return new Field("STRING", ignored.toString());
     }
 
     @Override
-    public Schema number(NumericNode number) {
-      if (number.isInt()) {
-        return Schema.create(Schema.Type.INT);
-      } else if (number.isLong()) {
-        return Schema.create(Schema.Type.LONG);
-      } else if (number.isFloat()) {
-        return Schema.create(Schema.Type.FLOAT);
-      } else if (number.isDouble()) {
-        return Schema.create(Schema.Type.DOUBLE);
-      } else {
-        throw new UnsupportedOperationException(
-            number.getClass().getName() + " is not supported");
-      }
+    public Field number(NumericNode number) {
+      return new Field("NUMBER", number.toString());
     }
 
     @Override
-    public Schema bool(BooleanNode ignored) {
-      return Schema.create(Schema.Type.BOOLEAN);
+    public Field bool(BooleanNode ignored) {
+      return new Field("BOOLEAN", ignored.toString());
     }
 
     @Override
-    public Schema nullNode(NullNode ignored) {
-      return Schema.create(Schema.Type.NULL);
+    public Field nullNode(NullNode ignored) {
+      throw new UnsupportedOperationException("NullNode is not supported.");
     }
 
     @Override
-    public Schema missing(MissingNode ignored) {
+    public Field missing(MissingNode ignored) {
       throw new UnsupportedOperationException("MissingNode is not supported.");
     }
+  }
+
+  private static String inferSchema(JsonNode node, String tableName) {
+    Field tableSchema = visit(node, new JsonSchemaVisitor().useMaps());
+    return "CREATE TABLE " + tableName + " (" + tableSchema.getContent() + ");";
+  }
+
+  public static String inferSchema(String rawJson, String tableName) throws IOException {
+    return JsonUtil.inferSchema(JsonUtil.parse(rawJson), tableName);
   }
 }
