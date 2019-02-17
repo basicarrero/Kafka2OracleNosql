@@ -1,5 +1,5 @@
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
+// import com.fasterxml.jackson.core.JsonFactory;
+// import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -13,8 +13,8 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+// import java.io.InputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,7 +49,7 @@ public class JsonUtil {
       return content.toString();
     }
   }
-
+/*
   private static final JsonFactory FACTORY = new JsonFactory();
 
   private static Iterator<JsonNode> parser(final InputStream stream) throws IOException {
@@ -57,13 +57,13 @@ public class JsonUtil {
     parser.setCodec(new ObjectMapper());
     return parser.readValuesAs(JsonNode.class);
   }
-
+*/
   private static JsonNode parse(String json) throws IOException {
     return new ObjectMapper().readValue(json, JsonNode.class);
   }
 
-  private static JsonNode parse(Path filePath) throws IOException {
-    String fileContent = String.join(" ", Files.readAllLines(filePath, StandardCharsets.UTF_8));
+  private static JsonNode parse(Path file) throws IOException {
+    String fileContent = String.join(" ", Files.readAllLines(file, StandardCharsets.UTF_8));
     return new ObjectMapper().readValue(fileContent, JsonNode.class);
   }
 
@@ -195,8 +195,9 @@ public class JsonUtil {
 
     @Override
     public Field object(ObjectNode object, Map<String, Field> fields) {
-      // TODO: Implementar seleccíon de tablas hijas o registros
-      if ( !isObjectsToRecords() && recordLevels.size() < 1) { /* TODO */ }
+      // if ( !isObjectsToRecords() && recordLevels.size() < 1) {
+      //   TODO: Implementar seleccíon de tablas hijas o registros
+      // }
       StringBuilder content = new StringBuilder();
       int counter = 1;
       for (Map.Entry<String, Field> r : fields.entrySet()) {
@@ -249,12 +250,18 @@ public class JsonUtil {
     }
   }
 
-  private static String inferSchema(JsonNode node, String tableName) {
+  private static String inferSchema(JsonNode node, String tableName, String pk) {
     Field tableSchema = visit(node, new JsonSchemaVisitor().useMaps());
-    return "CREATE TABLE " + tableName + " (" + tableSchema.getContent() + ");";
+    String statement = "CREATE TABLE " + tableName + " (" + tableSchema.getContent();
+    statement += (pk == null) ? ");" : ", PRIMARY KEY (" + pk + "));";
+    return statement;
   }
 
-  public static String inferSchema(String rawJson, String tableName) throws IOException {
-    return JsonUtil.inferSchema(JsonUtil.parse(rawJson), tableName);
+  public static String inferSchema(String rawJson, String tableName, String pk) throws IOException {
+    return inferSchema(parse(rawJson), tableName, pk);
+  }
+
+  public static String inferSchema(Path file, String tableName, String pk) throws IOException {
+    return inferSchema(parse(file), tableName, pk);
   }
 }
