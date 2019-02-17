@@ -1,7 +1,0 @@
-{"matricula":1234,
-  "modelo": "audi",
-  "partes":{"desgaste_ruedas":[8,8,5,4],
-            "motor":"V8"
-  },
-  "luces": ["delantera_der", "delantera_izq", "trasera", "emergencia"]
-}
