@@ -1,7 +1,7 @@
 package avt.nosql;
-// import com.fasterxml.jackson.core.JsonFactory;
-// import com.fasterxml.jackson.core.JsonParser;
-// import java.io.InputStream;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,7 +46,7 @@ public class JsonUtil {
       return content.toString();
     }
   }
-/*
+
   private static final JsonFactory FACTORY = new JsonFactory();
 
   private static Iterator<JsonNode> parser(final InputStream stream) throws IOException {
@@ -54,7 +54,7 @@ public class JsonUtil {
     parser.setCodec(new ObjectMapper());
     return parser.readValuesAs(JsonNode.class);
   }
-*/
+
   private static JsonNode parse(String json) throws IOException {
     return new ObjectMapper().readValue(json, JsonNode.class);
   }
@@ -211,7 +211,7 @@ public class JsonUtil {
             content.append(")");
           }
         }else {
-          // TODO:
+          // TODO: Implementar tratamiento de tipos nulos
         }
       }
       return new Field("RECORD", content.toString());
@@ -260,7 +260,7 @@ public class JsonUtil {
   private static String inferSchema(JsonNode node, String tableName, String pk) {
     Field tableSchema = visit(node, new JsonSchemaVisitor());
     String statement = "CREATE TABLE " + tableName + " (" + tableSchema.getContent();
-    statement += (pk == null) ? ");" : "PRIMARY KEY (" + pk + "));";
+    statement += (pk == null) ? ");" : " PRIMARY KEY (" + pk + "));";
     return statement;
   }
 
