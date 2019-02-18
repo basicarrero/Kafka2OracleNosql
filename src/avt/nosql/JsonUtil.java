@@ -196,10 +196,12 @@ public class JsonUtil {
       //   TODO: Implementar seleccíon de tablas hijas o registros
       // }
       StringBuilder content = new StringBuilder();
-      int counter = 1;
+      boolean firstBlood = false;
       for (Map.Entry<String, Field> r : fields.entrySet()) {
         Field f = r.getValue();
         if (f != null){
+          if (firstBlood) content.append(",\n");
+          firstBlood = true;
           content.append(r.getKey());
           content.append(" ");
           content.append(f.getType());
@@ -208,11 +210,9 @@ public class JsonUtil {
             content.append(f.getContent());
             content.append(")");
           }
-          if (counter < fields.size()) content.append(",\n");
         }else {
           // TODO:
         }
-        counter ++;
       }
       return new Field("RECORD", content.toString());
     }
@@ -220,8 +220,10 @@ public class JsonUtil {
     @Override
     public Field array(ArrayNode array, List<Field> elements) {
       // TODO: Distinguir entre array y map según el tipo de los elementos
-      String components = (elements.size() > 0) ? elements.get(0).getType() : "NULL";
-      return new Field("ARRAY", components);
+      if (elements.size() > 0)
+        return new Field("ARRAY", elements.get(0).getType());
+      else
+        return new Field("NULL", "");
     }
 
     @Override

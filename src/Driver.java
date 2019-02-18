@@ -7,6 +7,6 @@ public class Driver {
         if (args.length == 2 || args.length == 3)
             System.out.println(JsonUtil.inferSchema(Paths.get(args[1]), args[0], (args.length == 3) ? args[2] : null));
         else
-            System.out.println(JsonUtil.inferSchema(Paths.get("./tweet.json"), "tweets", "matricula"));
+            System.out.println(JsonUtil.inferSchema(Paths.get("./tweet.json"), "tweets", null));
     }
 }
