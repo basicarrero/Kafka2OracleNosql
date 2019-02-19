@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="580675d3-4af8-4a1f-a966-cf7ded8b2210" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Driver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/avt/nosql/JsonUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/avt/nosql/JsonUtil.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,39 +14,28 @@
     <option name="hideWarnings" value="true" />
     <option name="HIDE_WARNINGS" value="true" />
   </component>
+  <component name="FavoritesManager">
+    <favorites_list name="Kafka2OracleNosql" />
+  </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/avt/nosql/JsonUtil.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
-              <caret line="133" column="25" selection-start-line="133" selection-start-column="25" selection-end-line="133" selection-end-column="25" />
+            <state relative-caret-position="206">
+              <caret line="219" lean-forward="true" selection-start-line="219" selection-end-line="219" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="method#parse#0;class#JsonUtil#0" />
-                <element signature="class#JsonTreeVisitor#0;class#JsonUtil#0" />
-                <element signature="method#visit#0;class#JsonUtil#0" />
-                <element signature="method#setTableName#0;class#modelNode#0;class#JsonUtil#0" />
-                <element signature="e#4817#4818#0" expanded="true" />
-                <element signature="e#4840#4841#0" expanded="true" />
-                <element signature="e#5698#5699#0" expanded="true" />
-                <element signature="e#5758#5759#0" expanded="true" />
-                <element signature="e#4981#5020#0" />
-                <element signature="method#object#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
-                <element signature="method#array#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
-                <element signature="method#missing#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Driver.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
-              <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#7331#7332#0" expanded="true" />
+                <element signature="e#7375#7376#0" expanded="true" />
+                <element signature="e#7436#7437#0" expanded="true" />
+                <element signature="e#7480#7481#0" expanded="true" />
+                <element signature="e#7545#7546#0" expanded="true" />
+                <element signature="e#7589#7590#0" expanded="true" />
+                <element signature="e#7653#7654#0" expanded="true" />
+                <element signature="e#7698#7699#0" expanded="true" />
+                <element signature="e#7763#7764#0" expanded="true" />
+                <element signature="e#7805#7806#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -124,6 +111,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="PackagesPane">
         <subPane>
           <expand>
@@ -135,7 +123,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -216,14 +203,15 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49918166" visible="true" weight="0.2677761" />
-      <window_info id="Structure" order="1" sideWeight="0.5008183" side_tool="true" visible="true" weight="0.2677761" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.497545" weight="0.20726173" />
+      <window_info id="Structure" order="1" sideWeight="0.502455" side_tool="true" weight="0.27155825" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
       <window_info id="UI Designer" order="4" />
       <window_info id="Capture Tool" order="5" />
-      <window_info id="Favorites" order="6" side_tool="true" />
+      <window_info id="Favorites" order="6" sideWeight="0.502455" side_tool="true" weight="0.27155825" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3289689" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49924356" weight="0.80360067" />
@@ -298,41 +286,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/twlist_1.txt">
+    <entry file="file://$PROJECT_DIR$/src/twlist_1.txt" />
+    <entry file="file://$PROJECT_DIR$/src/avt/nosql/JsonUtil.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="29" column="5601" selection-start-line="29" selection-start-column="5601" selection-end-line="29" selection-end-column="5601" />
+        <state relative-caret-position="206">
+          <caret line="219" lean-forward="true" selection-start-line="219" selection-end-line="219" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#7331#7332#0" expanded="true" />
+            <element signature="e#7375#7376#0" expanded="true" />
+            <element signature="e#7436#7437#0" expanded="true" />
+            <element signature="e#7480#7481#0" expanded="true" />
+            <element signature="e#7545#7546#0" expanded="true" />
+            <element signature="e#7589#7590#0" expanded="true" />
+            <element signature="e#7653#7654#0" expanded="true" />
+            <element signature="e#7698#7699#0" expanded="true" />
+            <element signature="e#7763#7764#0" expanded="true" />
+            <element signature="e#7805#7806#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Driver.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
+        <state relative-caret-position="153">
           <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
           <folding>
             <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/avt/nosql/JsonUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="133" column="25" selection-start-line="133" selection-start-column="25" selection-end-line="133" selection-end-column="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#parse#0;class#JsonUtil#0" />
-            <element signature="class#JsonTreeVisitor#0;class#JsonUtil#0" />
-            <element signature="method#visit#0;class#JsonUtil#0" />
-            <element signature="method#setTableName#0;class#modelNode#0;class#JsonUtil#0" />
-            <element signature="e#4817#4818#0" expanded="true" />
-            <element signature="e#4840#4841#0" expanded="true" />
-            <element signature="e#5698#5699#0" expanded="true" />
-            <element signature="e#5758#5759#0" expanded="true" />
-            <element signature="e#4981#5020#0" />
-            <element signature="method#object#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
-            <element signature="method#array#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
-            <element signature="method#missing#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
           </folding>
         </state>
       </provider>

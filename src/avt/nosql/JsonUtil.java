@@ -217,20 +217,6 @@ public class JsonUtil {
   }
 
   public static class JsonSchemaVisitor extends JsonTreeVisitor<modelNode> {
-//    private boolean objectsToRecords;
-//
-//    JsonSchemaVisitor() {
-//      this.objectsToRecords  = true;
-//  }
-//
-//    boolean isObjectsToRecords() {
-//      return objectsToRecords;
-//    }
-//
-//    private JsonSchemaVisitor useMaps() {
-//      this.objectsToRecords = false;
-//      return this;
-//    }
 
     @Override
     public modelNode object(ObjectNode object, Map<String, modelNode> fields) {
