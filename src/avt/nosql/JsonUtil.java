@@ -1,7 +1,4 @@
 package avt.nosql;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,57 +8,16 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Stream;
 
 
 public class JsonUtil {
 
-  public static class Field {
-    private String type;
-    Object content;
-    Field(String type, Object content){
-      this.type = type;
-      this.content = content;
-    }
-
-    String getType() {
-      return type;
-    }
-
-    String getContent() {
-      return toString();
-    }
-
-    boolean isComplexField() {
-      return "ARRAY".equals(type) || "RECORD".equals(type);
-    }
-    @Override
-    public String toString() {
-      return content.toString();
-    }
-  }
-
-  private static final JsonFactory FACTORY = new JsonFactory();
-
-  private static Iterator<JsonNode> parser(final InputStream stream) throws IOException {
-    JsonParser parser = FACTORY.createParser(stream);
-    parser.setCodec(new ObjectMapper());
-    return parser.readValuesAs(JsonNode.class);
-  }
-
   private static JsonNode parse(String json) throws IOException {
     return new ObjectMapper().readValue(json, JsonNode.class);
-  }
-
-  private static JsonNode parse(Path file) throws IOException {
-    String fileContent = String.join(" ", Files.readAllLines(file, StandardCharsets.UTF_8));
-    return new ObjectMapper().readValue(fileContent, JsonNode.class);
   }
 
   public abstract static class JsonTreeVisitor<T> {
@@ -173,102 +129,178 @@ public class JsonUtil {
     }
   }
 
-  public static class JsonSchemaVisitor extends JsonTreeVisitor<Field> {
+  public static class modelNode {
+    private LinkedHashMap<String, modelNode> _childens;
+    private String _type;
+    private Boolean _isRoot;
 
-    private boolean objectsToRecords;
-
-    JsonSchemaVisitor() {
-      this.objectsToRecords  = true;
-  }
-
-    boolean isObjectsToRecords() {
-      return objectsToRecords;
+    modelNode(String type){
+      _isRoot = false;
+      _type = type.toUpperCase();
+      _childens = new LinkedHashMap<>();
     }
 
-    private JsonSchemaVisitor useMaps() {
-      this.objectsToRecords = false;
-      return this;
+    void addChild(String name, modelNode child) { _childens.put(name, child); }
+
+    void setType(String t) { _type = t.toUpperCase(); }
+
+    String getType() { return _type; }
+
+    modelNode getChild(String k) { return _childens.get(k); }
+
+    private Set<Map.Entry<String, modelNode>> getChildSet() { return _childens.entrySet(); }
+
+    boolean isRoot() { return _isRoot; }
+
+    boolean isNull() { return "NULL".equals(_type); }
+
+    void setTableName(String name) {
+      _type = "CREATE TABLE " + name;
+      _isRoot =  true;
     }
 
     @Override
-    public Field object(ObjectNode object, Map<String, Field> fields) {
-      // if ( !isObjectsToRecords() && recordLevels.size() < 1) {
-      //   TODO: Implementar seleccíon de tablas hijas o registros
-      // }
-      StringBuilder content = new StringBuilder();
-      boolean firstBlood = false;
-      for (Map.Entry<String, Field> r : fields.entrySet()) {
-        Field f = r.getValue();
-        if (f != null){
-          if (firstBlood) content.append(",\n");
-          firstBlood = true;
-          content.append(r.getKey());
-          content.append(" ");
-          content.append(f.getType());
-          if (f.isComplexField()) {
-            content.append(" (");
-            content.append(f.getContent());
-            content.append(")");
+    public String toString() {
+      return toString(0);
+    }
+
+    String toString(int tabs) {
+      if ("RECORD".equals(_type) || isRoot()) {
+        StringBuilder str = new StringBuilder();
+        str.append(_type);
+        str.append(" (");
+        for (Map.Entry<String, modelNode> ch : _childens.entrySet()) {
+          if (tabs > 0)
+            str.append("\n");
+          for (int c = tabs; c > 0; c--)
+            str.append("\t");
+          str.append(ch.getKey());
+          str.append(" ");
+          str.append((tabs > 0) ? ch.getValue().toString(tabs + 1) : ch.getValue().toString());
+          str.append(",");
+        }
+        str.setCharAt(str.length() - 1, ')');
+        return str.toString();
+      } else return _type;
+    }
+
+    boolean hasNullTypes() {
+      return isNull() || _childHasNull();
+    }
+
+    private boolean _childHasNull() {
+      for (Map.Entry<String, modelNode> ch : _childens.entrySet()) {
+        if (ch.getValue().hasNullTypes())
+          return true;
+      }
+      return false;
+    }
+
+    void mergeTypes(modelNode newNode) {
+      if (newNode != null) {
+        if (isNull() && ! newNode.isNull()){
+          setType(newNode.getType());
+          System.out.println("Nuevo TIPO añadido: " + newNode.getType());
+        }
+        for (Map.Entry<String, modelNode> ch : _childens.entrySet())
+          if (ch.getValue().getType().equals("RECORD"))
+            ch.getValue().mergeTypes(newNode.getChild(ch.getKey()));
+
+        for (Map.Entry<String, modelNode> ch : newNode.getChildSet()) {
+          if ( ! _childens.containsKey(ch.getKey()) && ! ch.getValue().isNull()) {
+            addChild(ch.getKey(), ch.getValue());
+            System.out.println("Nuevo CAMPO añadido: " + ch.getKey() + " " + ch.getValue().getType());
           }
-        }else {
-          // TODO: Implementar tratamiento de tipos nulos
         }
       }
-      return new Field("RECORD", content.toString());
+    }
+  }
+
+  public static class JsonSchemaVisitor extends JsonTreeVisitor<modelNode> {
+//    private boolean objectsToRecords;
+//
+//    JsonSchemaVisitor() {
+//      this.objectsToRecords  = true;
+//  }
+//
+//    boolean isObjectsToRecords() {
+//      return objectsToRecords;
+//    }
+//
+//    private JsonSchemaVisitor useMaps() {
+//      this.objectsToRecords = false;
+//      return this;
+//    }
+
+    @Override
+    public modelNode object(ObjectNode object, Map<String, modelNode> fields) {
+      modelNode modelObject = new modelNode("RECORD");
+      for (Map.Entry<String, modelNode> r : fields.entrySet()) {
+        modelObject.addChild(r.getKey(), r.getValue());
+      }
+      return modelObject;
     }
 
     @Override
-    public Field array(ArrayNode array, List<Field> elements) {
-      // TODO: Distinguir entre array y map según el tipo de los elementos
-      if (elements.size() > 0)
-        return new Field("ARRAY", elements.get(0).getType());
-      else
-        return new Field("NULL", "");
+    public modelNode array(ArrayNode array, List<modelNode> elements) {
+      if (elements.size() > 0) return new modelNode("ARRAY(" + elements.get(0).toString() + ")");
+      else return new modelNode("NULL");
     }
 
     @Override
-    public Field binary(BinaryNode ignored) {
-      return new Field("BINARY", ignored.toString());
+    public modelNode binary(BinaryNode ignored) {
+      return new modelNode("BINARY");
     }
 
     @Override
-    public Field text(TextNode ignored) {
-      return new Field("STRING", ignored.toString());
+    public modelNode text(TextNode ignored) {
+      return new modelNode("STRING");
     }
 
     @Override
-    public Field number(NumericNode number) {
-      return new Field("NUMBER", number.toString());
+    public modelNode number(NumericNode number) {
+      return new modelNode("NUMBER");
     }
 
     @Override
-    public Field bool(BooleanNode ignored) {
-      return new Field("BOOLEAN", ignored.toString());
+    public modelNode bool(BooleanNode ignored) {
+      return new modelNode("BOOLEAN");
     }
 
-/*    @Override
-    public Field nullNode(NullNode ignored) {
-      throw new UnsupportedOperationException("NullNode is not supported.");
-    }*/
+    @Override
+    public modelNode nullNode(NullNode ignored) {
+      return new modelNode("NULL");
+    }
 
     @Override
-    public Field missing(MissingNode ignored) {
+    public modelNode missing(MissingNode ignored) {
       throw new UnsupportedOperationException("MissingNode is not supported.");
     }
   }
 
-  private static String inferSchema(JsonNode node, String tableName, String pk) {
-    Field tableSchema = visit(node, new JsonSchemaVisitor());
-    String statement = "CREATE TABLE " + tableName + " (" + tableSchema.getContent();
-    statement += (pk == null) ? ");" : " PRIMARY KEY (" + pk + "));";
-    return statement;
+  public static String inferSchema(final Stream<String> in, String tableName) throws IOException {
+    modelNode model = null;
+    JsonSchemaVisitor visitor = new JsonSchemaVisitor();
+    Iterator<String> sit = in.iterator();
+    if (sit.hasNext()) {
+      JsonNode node = parse(sit.next());
+      model = visit(node, visitor);
+      model.setTableName(tableName);
+      while (sit.hasNext() && model.hasNullTypes()) {
+        model.mergeTypes(visit(parse(sit.next()), visitor));
+      }
+    }
+    if ( !sit.hasNext() && model != null && model.hasNullTypes()) {
+      System.err.println(model.toString(1));
+      throw new IOException("Sample is not enought to infer all types!");
+    }
+    return (model != null) ? model.toString(1) : "";
   }
 
-  public static String inferSchema(String rawJson, String tableName, String pk) throws IOException {
-    return inferSchema(parse(rawJson), tableName, pk);
-  }
-
-  public static String inferSchema(Path file, String tableName, String pk) throws IOException {
-    return inferSchema(parse(file), tableName, pk);
+  public static String inferSchema(Path file, String tableName) throws IOException {
+    Stream<String> stream = Files.lines(file);
+    String res = inferSchema(stream, tableName);
+    stream.close();
+    return res;
   }
 }

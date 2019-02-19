@@ -4,6 +4,7 @@
     <list default="true" id="580675d3-4af8-4a1f-a966-cf7ded8b2210" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Driver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/avt/nosql/JsonUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/avt/nosql/JsonUtil.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,11 +18,26 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/twlist.txt">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/avt/nosql/JsonUtil.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="986">
-              <caret line="58" selection-start-line="58" selection-end-line="58" />
+            <state relative-caret-position="442">
+              <caret line="133" column="25" selection-start-line="133" selection-start-column="25" selection-end-line="133" selection-end-column="25" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="method#parse#0;class#JsonUtil#0" />
+                <element signature="class#JsonTreeVisitor#0;class#JsonUtil#0" />
+                <element signature="method#visit#0;class#JsonUtil#0" />
+                <element signature="method#setTableName#0;class#modelNode#0;class#JsonUtil#0" />
+                <element signature="e#4817#4818#0" expanded="true" />
+                <element signature="e#4840#4841#0" expanded="true" />
+                <element signature="e#5698#5699#0" expanded="true" />
+                <element signature="e#5758#5759#0" expanded="true" />
+                <element signature="e#4981#5020#0" />
+                <element signature="method#object#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
+                <element signature="method#array#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
+                <element signature="method#missing#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -29,20 +45,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Driver.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="9" column="75" selection-start-line="9" selection-start-column="75" selection-end-line="9" selection-end-column="75" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/avt/nosql/JsonUtil.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-440">
-              <caret line="213" column="57" selection-start-line="213" selection-start-column="57" selection-end-line="213" selection-end-column="57" />
+            <state relative-caret-position="187">
+              <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -66,6 +70,7 @@
       <find>NullNode is not supported</find>
       <find>getContent</find>
       <find>parse(</find>
+      <find>96, 100</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -86,9 +91,10 @@
         <option value="$PROJECT_DIR$/src/avt/nosql/Driver.java" />
         <option value="$PROJECT_DIR$/src/sample2.json" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/src/avt/nosql/JsonUtil.java" />
         <option value="$PROJECT_DIR$/src/twlist.txt" />
+        <option value="$PROJECT_DIR$/src/twlist_1.txt" />
         <option value="$PROJECT_DIR$/src/Driver.java" />
+        <option value="$PROJECT_DIR$/src/avt/nosql/JsonUtil.java" />
       </list>
     </option>
   </component>
@@ -114,12 +120,6 @@
               <item name="Kafka2OracleNosql" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="Kafka2OracleNosql" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Kafka2OracleNosql" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="nosql" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -143,10 +143,10 @@
     <property name="Repository.Attach.Annotations" value="false" />
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550507993370" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550560540569" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/src" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/bin" />
-    <property name="project.structure.last.edited" value="Global Libraries" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.38505748" />
     <property name="settings.editor.selected.configurable" value="Errors" />
@@ -160,8 +160,8 @@
       <recent name="avt.nosql" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\basilio.carrero\Desktop\Kafka2OracleNosql\src\avt\nosql" />
       <recent name="C:\Users\basilio.carrero\Desktop\Kafka2OracleNosql\src" />
+      <recent name="C:\Users\basilio.carrero\Desktop\Kafka2OracleNosql\src\avt\nosql" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -216,10 +216,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17549168" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49918166" visible="true" weight="0.2677761" />
+      <window_info id="Structure" order="1" sideWeight="0.5008183" side_tool="true" visible="true" weight="0.2677761" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
       <window_info id="UI Designer" order="4" />
@@ -227,14 +226,14 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3289689" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49924356" weight="0.37806875" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39934534" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49924356" weight="0.80360067" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.3927987" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3289689" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.3289689" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50075644" side_tool="true" weight="0.2569558" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Version Control" order="9" weight="0.3289689" />
       <window_info anchor="bottom" id="Messages" order="10" weight="0.3289689" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -294,15 +293,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/twlist.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="986">
-          <caret line="58" selection-start-line="58" selection-end-line="58" />
+        <state relative-caret-position="153">
+          <caret line="36" lean-forward="true" selection-end-line="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/twlist_1.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="29" column="5601" selection-start-line="29" selection-start-column="5601" selection-end-line="29" selection-end-column="5601" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Driver.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="75" selection-start-line="9" selection-start-column="75" selection-end-line="9" selection-end-column="75" />
+        <state relative-caret-position="187">
+          <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -311,10 +317,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/avt/nosql/JsonUtil.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-440">
-          <caret line="213" column="57" selection-start-line="213" selection-start-column="57" selection-end-line="213" selection-end-column="57" />
+        <state relative-caret-position="442">
+          <caret line="133" column="25" selection-start-line="133" selection-start-column="25" selection-end-line="133" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#parse#0;class#JsonUtil#0" />
+            <element signature="class#JsonTreeVisitor#0;class#JsonUtil#0" />
+            <element signature="method#visit#0;class#JsonUtil#0" />
+            <element signature="method#setTableName#0;class#modelNode#0;class#JsonUtil#0" />
+            <element signature="e#4817#4818#0" expanded="true" />
+            <element signature="e#4840#4841#0" expanded="true" />
+            <element signature="e#5698#5699#0" expanded="true" />
+            <element signature="e#5758#5759#0" expanded="true" />
+            <element signature="e#4981#5020#0" />
+            <element signature="method#object#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
+            <element signature="method#array#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
+            <element signature="method#missing#0;class#JsonSchemaVisitor#0;class#JsonUtil#0" />
           </folding>
         </state>
       </provider>
@@ -385,6 +403,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
+          <last-edited>lib</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
